@@ -32,12 +32,15 @@ public class EchoClient {
         textField.addActionListener(event -> {
             String userOutput = textField.getText();
             out.println(userOutput);
-//            writeToMessageArea(userOutput);
-            messageArea.append("me " + userOutput + "\n");
+            writeToMessageArea(userOutput);
+//            messageArea.append("me " + userOutput + "\n");
             textField.setText("");
         });
 
-        disconnectButton.addActionListener(event -> out.println("disconnect " + userName));
+        disconnectButton.addActionListener(event -> {
+            out.println("disconnect " + userName);
+            System.exit(0);
+        });
     }
 
     private synchronized void writeToMessageArea(String s) {
@@ -63,21 +66,25 @@ public class EchoClient {
                 String serverInputString;
                 while ( in.hasNextLine() ) {
                     serverInputString = in.nextLine();
-                    out.println(serverInputString);
-//                    writeToMessageArea(serverInputString);
-                    messageArea.append(serverInputString + "\n");
+                    writeToMessageArea(serverInputString);
+//                    messageArea.append(serverInputString + "\n");
                 }
             }
         };
-
         serverInput.start();
-
     }
 
     public static void main(String[] args) throws IOException {
-        EchoClient client = new EchoClient();
-        client.frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        client.frame.setVisible(true);
-        client.run(args);
+        EventQueue.invokeLater(() -> {
+            EchoClient client = new EchoClient();
+            client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            client.frame.setLocationByPlatform(true);
+            client.frame.setVisible(true);
+            try {
+                client.run(args);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
